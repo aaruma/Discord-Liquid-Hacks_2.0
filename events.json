@@ -1,0 +1,22 @@
+{
+    "Sleep": {
+        "name": "Sleep",
+        "date": "10/11/2021",
+        "time": "15:00"
+    },
+    "Grind": {
+        "name": "Grind",
+        "date": "10/11/2021",
+        "time": "13:00"
+    },
+    "Eat": {
+        "name": "Eat",
+        "date": "10/11/2021",
+        "time": "19:00"
+    },
+    "Event": {
+        "name": "Event",
+        "date": "11/12/2021",
+        "time": "08:00"
+    }
+}
