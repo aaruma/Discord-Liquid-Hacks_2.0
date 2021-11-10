@@ -23,6 +23,5 @@ async def on_message(message):
              
     if message.content.startswith('!list'):
         await message.channel.send("Bong")
-        hello babu
          
 client.run(token)
