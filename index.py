@@ -1,6 +1,8 @@
 import discord 
 import json
 
+from discord import message
+
 events = {}
 
 def write(dict=events):
@@ -21,30 +23,22 @@ def enter_event(command):
         events = read_json
         
     events[new_event["name"]] = new_event
-
     write(events)
-    
-    
-while True: 
-    command = input("calendar-bot>").split(" ")
 
-    if command[0] == "event":
-        enter_event(command)
-    else:
-        print("'%s' not a command. Enter --commands to see a list of valid commands" % command[0])
-
-# def read_token():
-#     with open("token.txt", "r") as f:
-#         lines = f.readlines()
-#         return lines[0].strip()
+def read_token():
+    with open("token.txt", "r") as f:
+        lines = f.readlines()
+        return lines[0].strip()
     
-# token = read_token()
-# client = discord.Client()
+token = read_token()
+client = discord.Client()
 
-# @client.event
-# async def on_message(message):
-#      # print(message.content)
-#      if message.content.find("!ping") != -1:
-#          await message.channel.send("Pong")
-     
-# client.run(token)
+@client.event
+async def on_message(message):
+     # print(message.content)
+     if message.content.startswith('!event') != -1:
+        enter_event(message.content)
+     else:
+        print("'%s' not a command. Enter --commands to see a list of valid commands" % message[0])
+        
+client.run(token)
