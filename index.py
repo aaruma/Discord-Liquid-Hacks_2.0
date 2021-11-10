@@ -1,7 +1,24 @@
 import discord 
 import json
 
-from discord import message
+def read_token():
+    with open("token.txt", "r") as f:
+        lines = f.readlines()
+        return lines[0].strip()
+    
+token = read_token()
+client = discord.Client()
+
+@client.event
+async def on_message(message):
+     # print(message.content)
+     content = message.content.split(" ")
+     if message.content.startswith('$event'):
+         enter_event(content)
+     else:
+        print("'%s' not a command. Enter --commands to see a list of valid commands" % content[0])
+        
+client.run(token)
 
 events = {}
 
@@ -25,20 +42,3 @@ def enter_event(command):
     events[new_event["name"]] = new_event
     write(events)
 
-def read_token():
-    with open("token.txt", "r") as f:
-        lines = f.readlines()
-        return lines[0].strip()
-    
-token = read_token()
-client = discord.Client()
-
-@client.event
-async def on_message(message):
-     # print(message.content)
-     if message.content.startswith('!event') != -1:
-        print(message.content)
-     else:
-        print("'%s' not a command. Enter --commands to see a list of valid commands" % message[0])
-        
-client.run(token)
