@@ -15,7 +15,7 @@ async def on_message(message):
      if message.content.find("!ping") != -1:
          await message.channel.send("Pong")
      
-     if message.content.find('!remove-event','!delete-event') != -1:
+     if message.content.find('!remove-event') != -1:
          await message.channel.send("Message deleted") 
          
      
