@@ -37,7 +37,7 @@ client = discord.Client()
 async def on_message(message):
      # print(message.content)
      if message.content.startswith('!event') != -1:
-        enter_event(message.content)
+        print(message.content)
      else:
         print("'%s' not a command. Enter --commands to see a list of valid commands" % message[0])
         
