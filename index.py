@@ -8,10 +8,15 @@ def read_token():
 token = read_token()
 client = discord.Client()
 
+
 @client.event
 async def on_message(message):
      # print(message.content)
      if message.content.find("!ping") != -1:
          await message.channel.send("Pong")
+     
+     if message.content.find('!remove-event','!delete-event') != -1:
+         await message.channel.send("Message deleted") 
+         
      
 client.run(token)
