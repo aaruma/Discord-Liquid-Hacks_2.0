@@ -36,9 +36,9 @@ Y_PIXEL = 100
 template.text((X_PIXEL,Y_PIXEL), "Today's TO-DO List/Events", font=SUBTITLE_FNT, stroke_width=1)
 
 # Sample events
-event1 = Event("Liquid has lol man ok bro sick cracked navid rahman altaaf ! GRIND OK TEST LOL", "2021-11-10", "8:30pm")
-event2 = Event("Liquid HACKS SUMBISSION TIME", "2021-11-11", "5:30pm")
-event3 = Event("CHILLING WITH DA BOIS!", "2021-11-11", "9:30pm")
+event1 = Event("EVENT DESCRIPTION TEST 1 LONG VERSION TEST 1 TEST TEST TEST TES TES TEST ", "2021-11-10", "8:30pm")
+event2 = Event("EVENT DESCRITION 2 !(*&^*(&", "2021-11-11", "5:30pm")
+event3 = Event("EVENT DESCRIPTION 3 TEST TEST", "2021-11-11", "9:30pm")
 
 # Sample Calendar
 calendar = Calendar("Calendar 1")
@@ -154,4 +154,4 @@ for event in calendar.getEvents():
 
 # print(calendar.getEvents())
 # print(calendar)
-out.save("test.png")
+out.save("render.png")

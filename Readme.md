@@ -1,0 +1,1 @@
+#Representing calendar events/reminders, pictographically utilizing the PIL(Python Imaging Library) library.
