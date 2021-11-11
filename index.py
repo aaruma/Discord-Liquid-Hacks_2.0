@@ -65,8 +65,6 @@ commands = '''```list of Calendar Bot commands:
             - Example Valid Input:
                 -> $help
 
-        
-        
         ```'''
 
 def write(dict):
@@ -94,7 +92,9 @@ async def on_ready():
 @client.event
 async def on_message(message):
     msg = message.content
-    if msg.startswith('$add') or msg.startswith('$change'):
+    if msg.startswith('$display'):
+        await message.channel.send("Not done yet.")
+    elif msg.startswith('$add') or msg.startswith('$change'):
         
         #check if theres multiple '
         c = 0
@@ -132,15 +132,15 @@ async def on_message(message):
             with open("events.json") as r:
                 events = json.load(r)
                 d = events.pop(name[1], None)
-                
                 if d == None:
                     await message.channel.send("Event not found.")
+            
+            write(events) 
         except:
             await message.channel.send("Improper syntax") 
             
     elif msg.startswith('$clear'):
         events = {}
         write(events)
-        
-        
+            
 client.run(token)
