@@ -1,251 +1,414 @@
-# from os import name
+from os import name
 import discord 
 import json
+from discord.ext import commands
+import datetime
+from add_event import add_change
 
-# from discord import message
+from discord import message
 
-# def read_token():
-#     with open("token.txt", "r") as f:
-#         lines = f.readlines()
-#         return lines[0].strip()
+def read_token():
+    with open("token.txt", "r") as f:
+        lines = f.readlines()
+        return lines[0].strip()
     
-# token = read_token()
-# client = discord.Client()
+token = read_token()
+client = discord.Client()
+client = commands.Bot(command_prefix = '$')
 
-# commands = '''```list of Calendar Bot commands:
-        
-#         $add                <name> <date> <time> 
-        
-#             - Add events to your scehdule with a name, date and time.
-#             - If the event name has multiple words, surround the name with apostrophes.
-#             - Do not use more than 2 apostrphes
-#             - Example Valid Inputs:
-#                 -> $add 'Team Liquid Vs. Vitality CS:GO Game' 24/11/21 6:00pm
-#                 -> $add Lecture 15/11/21 8:00am
-        
-#         $events             <none>
-#                             <event name>
+daysinmonth = {
+    1: 31,
+    2: 28,
+    3: 31,
+    4: 30,
+    5: 31,
+    6: 30,
+    6: 31,
+    8: 31,
+    9: 30,
+    10: 31,
+    11: 30,
+    12: 31,
+}
 
-#             - Displays all planned events in a timely order.
-#             - To display all events do not specify an event name.
-#             - To display the details of a specific event, use the events command followed by the event name.
-#             - If the event name has multiple words, surround the name with apostrophes.
-#             - Example Valid Inputs:
-#                 -> $events
-#                 -> $events Lecture
-#                 -> $events 'Team Liquid Vs. Vitality CS:GO Game'
+commands = '''```list of Calendar Bot commands:
+        
+        $add                <name> <date> <time> 
+        
+            - Add events to your scehdule with a name, date and time.
+            - If the event name has multiple words, surround the name with apostrophes.
+            - Do not use more than 2 apostrphes
+            - Example Valid Inputs:
+                -> $add 'Team Liquid Vs. Vitality CS:GO Game' 24/11/21 6:00pm
+                -> $add Lecture 15/11/21 8:00am
+        
+        $events             <none>
+                            <event name>
+
+            - Displays all planned events in a timely order.
+            - Example Valid Inputs:
+                -> $events
+                -> $events Lecture
+                -> $events 'Team Liquid Vs. Vitality CS:GO Game'
                             
-#         $change             <name> <date> <time>
+        $change             <name> <date> <time>
         
-#             - Change event dates and times in your scehdule with an existing name, new date and new time.
-#             - If the event name has multiple words, surround the name with apostrophes.
-#             - Do not use more than 2 apostrphes
-#             - Example Valid Inputs:
-#                 -> $add 'Team Liquid Vs. Vitality CS:GO Game' 24/11/21 6:00pm
-#                 -> $add Lecture 15/11/21 8:00am
+            - Same format as adding except you use an existing event name.
+            - Example Valid Inputs:
+                -> $add 'Team Liquid Vs. Vitality CS:GO Game' 24/11/21 6:00pm
+                -> $add Lecture 15/11/21 8:00am
 
-#         $delete             <event name>
+        $delete             <event name>
 
-#             - Delete an event within planned schedule, with an existing event name.
-#             - If the event name has multiple words, surround the name with apostrophes.
-#             - Example Valid Inputs:
-#                 -> $delete Lecture
-#                 -> $delete 'Team Liquid Vs. Vitality CS:GO Game'
+            - Delete an event within planned schedule, with an existing event name.
+            - Example Valid Inputs:
+                -> $delete Lecture
+                -> $delete 'Team Liquid Vs. Vitality CS:GO Game'
 
-#         $clear              <none>
+        $clear              <none>
             
-#             - Clears all planned events within a schedule.
-#             - Example Valid Input:
-#                 -> $clear
+            - Clears all planned events within a schedule.
+            - Example Valid Input:
+                -> $clear
         
-#         $help               <none>
+        $display            <none>
+        
+            - Displays all planned events.
+            - Example Valid Input:
+                -> $display
+        
+        $help               <none>
 
-#             - Displays all bot commands and descriptions.
-#             - Example Valid Input:
-#                 -> $help
-
-#         ```'''
-
-# daysinmonth = {
-#     1: 31,
-#     2: 28,
-#     3: 31,
-#     4: 30,
-#     5: 31,
-#     6: 30,
-#     6: 31,
-#     8: 31,
-#     9: 30,
-#     10: 31,
-#     11: 30,
-#     12: 31,
-# }
-
-events = {}
+            - Displays all bot commands and descriptions.
+            - Example Valid Input:
+                -> $help
+        
+        ```'''
 
 def write(dict):
     json_object = json.dumps(dict, indent = 4)
     with open("events.json", "w") as outfile:
-        outfile.write(json_object)  
-
-channel = ""
-
-# async def testDate(msg, channel):
-#     pass
-
-async def send(message):
-    await message.channel.send(message)
-
-def add_change(msg):
-    # Reading from events.json
-    with open("events.json") as r:
-        file = json.load(r) # type = dictionary
-        print(file)
-        # Event to be added
-        new_event = {
-            "name": msg[1],
-            "date": msg[2],
-            "time": msg[3],
-            "priority": len(file) + 1
-        }
+        outfile.write(json_object)    
         
-        if msg[0] == "$change" and file.get(msg[1], False) == False:
-                # send("Event does not exist.")
-                print("Event not found.")
-                return False
-        elif msg[0] == "$add" and not file.get(msg[1], False) == False:
-                # send("Event already exists. Use the change command to change an exisiting event.")
-                print("Event already exists. Use the 'change' command to change an exisiting event.")
-                return False
-        else:
-                # If change then remove event that is to be changed and just proceed with adding (it again)
-                if msg[0] == "$change":
-                    print("popped ", file.pop(msg[1]))
-                    
-                events = file
-                print(list(events))
-                
-                # Checking for time conflict
-                for event in events:
-                    curr = events[event]
-                    if new_event["date"] == curr["date"]:
-                        if new_event["time"] == curr["time"]:
-                            print("Time slot is occupied by an existing event.")
-                            return False
-                
-                # Appending new event
-                events[new_event["name"]] = new_event
-                new_list  = {}
-                
-                # Sorting priorities in each event
-                for event in events:
-                    curr = events[event]
-                    curr_date = curr["date"].split('/')
-                    new_date = new_event["date"].split('/')
-                    # print(curr)
-                    # print(new_event)
-                    if new_date[2] > curr_date[2]: # Year
-                        continue
-                    elif new_date[2] == curr_date[2]:
-                        # print("year equal")
-                        if  new_date[0] > curr_date[0]: # Month
-                            continue
-                        elif new_date[0] == curr_date[0]:
-                            # print("month equal")
-                            if new_date[1] > curr_date[1]: # Day
-                                continue
-                            elif new_date[1] == curr_date[1]:
-                                # print("day equal")
-                                curr_time = int(curr["time"].replace(":", ""))
-                                new_time = int(new_event["time"].replace(":", ""))
-                                # print(new_time, curr_time)
-                                if new_time > curr_time:
-                                    continue
-                    
-                    # Swap priorities
-                    temp = new_event["priority"] # 5
-                    new_event["priority"] = curr["priority"] # 3
-                    curr["priority"] = temp # 5
-                    
-                    # New event for comparison = perviously swapped (curr)
-                    new_event = curr
-                    # print("switch")
-                
-                # Appending to new dictionary based on sorted priorities
-                for num in range(len(events)):
-                    for event in events:
-                        if events[event]["priority"] == num + 1:
-                            new_list[event] = events[event]
-                            
-                write(new_list)
-                                                            
-                return True
-              
-print(add_change(["$change", "Dude", "5/23/2022", "7:00"]))
+@client.event
+async def on_ready():
+    print("We have logged in as {0.user}".format(client))
 
-#yoyo umm well does ur code account for if the event name is larger than 1?
 
-# @client.event
-# async def on_ready():
-#     print("We have logged in as {0.user}".format(client))
+@client.command()
+async def display(ctx):
+    embed = discord.Embed(
+            title = ':calendar_spiral: CALENDAR',
+            url = 'https://calendar.google.com/calendar/u/0/r/month/',
+            description = 'These are your upcoming scheduled events!',
+            colour = 0x199400
+            )
     
-# @client.event
-# async def on_message(message):
-#     msg = message.content
-#     channel = client.get_channel(channel_id)
-#     if msg.startswith('$display'):
-#         await message.channel.send("Not done yet.")
-#     elif msg.startswith('$add') or msg.startswith('$change'):
-        
-#         #check if theres multiple '
-#         c = 0
-#         for i in range(len(msg)):
-#             if msg[i] == "'":
-#                 c += 1
+    embed.set_thumbnail(url = 'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/2/25/Team_Liquidlogo_profile.png/revision/latest?cb=20210319225201')
+    embed.timestamp = datetime.datetime.utcnow()
+    embed.set_footer(text='To interact with your schedule, type $help')
+    
+    with open('events.json') as f:
+        obj = json.load(f)
 
-#         if c > 2:
-#             await message.channel.send("You cannot use apostrophes within the event name!")
-#         elif c == 1:
-#             await message.channel.send("You must add an apostrophe at the end of the event name!")
-#         else:
-#             #check if name is multiple words
-#             m = msg.split(" ")
-#             if ((len(m) > 4) and (m[1][0] == "'") and (m[-3][-1] == "'") and c == 2):
-#                 s = msg.split("'")
-#                 add
-# = s[0].strip()
-#                 datetime = s[2].strip().split(' ')
-#                 string = []
-#                 string.append(add)  
-#                 string.append(s[1])
-#                 string.append(datetime[0]) 
-#                 string.append(datetime[1])
-#                 add_change(string)
-#             elif ((len(m) > 4) and ((m[1][0] != "'") or (m[-3][-1] != "'"))):
-#                 await message.channel.send("You have not declared the event name correctly!")
-#             elif len(m) == 4:
-#                 add_change(msg)
-#
-#                
-#                
-#     elif msg.startswith('$help'):
-#         await message.channel.send(commands)
-#     elif msg.startswith('$delete'):
-#         try:
-#             name = msg.split("'")
-#             with open("events.json") as r:
-#                 events = json.load(r)
-#                 d = events.pop(name[1], None)
-#                 if d == None:
-#                     await message.channel.send("Event not found.")
-            
-#             write(events) 
-#         except:
-#             await message.channel.send("Improper syntax") 
-            
-#     elif msg.startswith('$clear'):
-#         events = {}
-#         write(events)
-#     elif msg.startswith('$ping'):
+    # Conveting time to 24hr
+    for i in obj:
+        l = obj[i]['time'].split(":")
+        pringle = l[0]
+        pringle = int(pringle)
+        
+        # Displays the actual calendar
+        if ((pringle != 0) and (pringle < 10)):
+            embed.add_field(name="{}".format(obj[i]['date']), value = '``` {} am   |   {}```'.format(obj[i]['time'], obj[i]['name']), inline = False)
+        elif (pringle == 0):
+            pringle = 12
+            embed.add_field(name="{}".format(obj[i]['date']), value = '```{}{}{}{} am   |   {}```'.format(pringle, obj[i]['time'][2], obj[i]['time'][3], obj[i]['time'][4], obj[i]['name']), inline = False)
+        else:
+            if (pringle > 12):
+                pringle -= 12
+                if pringle < 10:
+                    embed.add_field(name="{}".format(obj[i]['date']), value = '``` {}{}{}{} pm   |   {}```'.format(pringle, obj[i]['time'][2], obj[i]['time'][3], obj[i]['time'][4], obj[i]['name']), inline = False)
+                else:
+                    embed.add_field(name="{}".format(obj[i]['date']), value = '```{}{}{}{} pm   |   {}```'.format(pringle, obj[i]['time'][2], obj[i]['time'][3], obj[i]['time'][4], obj[i]['name']), inline = False)
+            elif (pringle == 12):
+                    embed.add_field(name="{}".format(obj[i]['date']), value = '```{}{}{}{} pm   |   {}```'.format(pringle, obj[i]['time'][2], obj[i]['time'][3], obj[i]['time'][4], obj[i]['name']), inline = False)
+            else:
+                embed.add_field(name="{}".format(obj[i]['date']), value = '```{} am   |   {}```'.format(obj[i]['time'], obj[i]['name']), inline = False)
+    
+    await ctx.send(embed=embed)
+
+
+@client.event
+async def on_message(message):
+    msg = message.content
+    if msg.startswith('$display'):
+        pass
+    elif msg.startswith('$add') or msg.startswith('$change'):
+        
+        #check if theres multiple '
+        c = 0
+        for i in range(len(msg)):
+            if msg[i] == "'":
+                c += 1
+
+        if c > 2:
+            await message.channel.send("You cannot use apostrophes within the event name!")
+        elif c == 1:
+            await message.channel.send("You must add an apostrophe at the end of the event name!")
+        else:
+            #check if name is multiple words
+            m = msg.split(" ")
+            if ((len(m) > 4) and (m[1][0] == "'") and (m[-3][-1] == "'") and c == 2):
+                
+                s = msg.split("'")
+                add = s[0].strip()
+                datetime = s[2].strip().split(' ')
+                string = []
+                string.append(add)  
+                string.append(s[1])
+                
+                ### Check if date is valid
+
+                x = str(datetime[0])
+                
+                slash = 0
+                for i in range(len(x)):
+                    if x[i] == "/":
+                        slash += 1
+
+                if slash != 2:
+                    await message.channel.send("You have not declared the event date correctly!")
+                    print("Incorrect date format!")
+                else:
+                    z = x.split("/")
+                    try:
+                        z[0] = int(z[0])
+                        z[1] = int(z[1])
+                        z[2] = int(z[2])
+                    except Exception:
+                        await message.channel.send("You have not declared the event month correctly!")
+                        print("Incorrect Date format!")
+                    else:
+                        if ((z[0] >= 1) and (z[0] <= 12)):
+                            if ((z[1] >= 1) and z[1] <= daysinmonth[z[0]]):
+                                if(z[2] >= 21):
+                                    string.append(datetime[0])  #append date onto string
+                                    
+                                    ### NAME AND DATE CORRECT -> CHECK TIME
+                                    
+                                    y = datetime[1]
+                                    
+                                    colin = 0
+                                    for i in range(len(y)):
+                                        if y[i] == ":":
+                                            colin += 1
+
+                                    if colin != 1:
+                                        await message.channel.send("You have not declared the event time correctly!")
+                                    else:
+                                        b = y.split(":")
+                                        if len(b) != 2:
+                                            await message.channel.send("You have not declared the event time correctly!")
+                                        else:
+                                            if len(b[1]) != 4:
+                                                await message.channel.send("You have not declared the event time correctly!")
+                                            else:
+                                                t = []
+                                                t.append(str(b[0]))
+                                                t.append(str(b[1][0] + b[1][1]))
+                                                t.append(str(b[1][2] + b[1][3]))
+                                                try:
+                                                    t[0] = int(t[0])
+                                                    t[1] = int(t[1])
+                                                except Exception:
+                                                    await message.channel.send("You have not declared the event time correctly!")
+                                                else:
+                                                    if ((t[0] >= 1) and (t[0] <= 12)):
+                                                        if ((t[1] >= 0) and (t[1] <= 59)):
+                                                            if ((t[2] == "am") or (t[2] == "pm")):
+                                                                
+                                                                ### WORKED
+
+                                                                v = datetime[1]
+                                                                if v[-2] == "a":
+                                                                    if t[0] < 10:
+                                                                        v = v[0] + v[1] + v[2] + v[3]
+                                                                    else:
+                                                                        #v = "12:00am"
+                                                                        pumper = v[0] + v[1]
+                                                                        pumper = int(pumper)
+                                                                        if pumper == 12:
+                                                                            s = list(v)
+                                                                            s[0] = "0"
+                                                                            s[1] = "0"
+                                                                            v = "".join(s)
+                                                                            
+                                                                        v = v[0] + v[1] + v[2] + v[3] + v[4]
+                                                                            
+                                                                        #v = "00:00"
+                                                                        
+                                                                elif v[-2] == "p":
+                                                                    pumper = v[0] + v[1]
+                                                                    pumper = int(pumper)
+                                                                    if pumper == 12:
+                                                                        t[0] = 12
+                                                                    else:
+                                                                        t[0] += 12      
+                                                                    
+                                                                    if len(v) == 6: 
+                                                                        v = str(t[0]) + v[1] + v[2] + v[3]
+                                                                    else:
+                                                                        v = str(t[0]) + v[2] + v[3] + v[4]
+                                                                
+                                                                string.append(v)
+                                                                print("Valid Input : Multiple Word Name ->")
+                                                                print(string)
+                                                                add_change(string)
+                                                                
+                                                            else:
+                                                                await message.channel.send("You have not declared the event time correctly!")
+                                                        else:
+                                                            await message.channel.send("You have not declared the event minute correctly!")
+                                                    else:
+                                                        await message.channel.send("You have not declared the event Hour correctly!")       
+                                else:
+                                    await message.channel.send("You have not declared the event year correctly!")
+                            else:
+                                await message.channel.send("You have not declared the event Day correctly!")
+                        else:
+                            await message.channel.send("You have not declared the event year correctly!")
              
-# client.run(token)
+            elif ((len(m) > 4) and ((m[1][0] != "'") or (m[-3][-1] != "'"))):
+                await message.channel.send("You have not declared the event name correctly!")
+            elif len(m) == 4:
+                
+                ### TEST DATE
+                
+                x = m[2]
+                y = m[3]
+                
+                slash = 0
+                for i in range(len(x)):
+                    if x[i] == "/":
+                        slash += 1
+
+                if slash != 2:
+                    await message.channel.send("You have not declared the event date correctly!")
+                else:
+                    z = x.split("/")
+                    try:
+                        z[0] = int(z[0])
+                        z[1] = int(z[1])
+                        z[2] = int(z[2])
+                    except Exception:
+                        await message.channel.send("You have not declared the event month correctly!")
+                    else:
+                        if ((z[0] >= 1) and (z[0] <= 12)):
+                            if ((z[1] >= 1) and z[1] <= daysinmonth[z[0]]):
+                                if(z[2] >= 21):
+                                    
+                                    #NAME AND DATE GOOD -> CHECK TIME
+                                    
+                                    colin = 0
+                                    for i in range(len(y)):
+                                        if y[i] == ":":
+                                            colin += 1
+
+                                    if colin != 1:
+                                        await message.channel.send("You have not declared the event time correctly!")
+                                    else:
+                                        b = y.split(":")
+                                        if len(b) != 2:
+                                            await message.channel.send("You have not declared the event time correctly!")
+                                        else:
+                                            if len(b[1]) != 4:
+                                                await message.channel.send("You have not declared the event time correctly!")
+                                            else:
+                                                t = []
+                                                t.append(str(b[0]))
+                                                t.append(str(b[1][0] + b[1][1]))
+                                                t.append(str(b[1][2] + b[1][3]))
+                                                try:
+                                                    t[0] = int(t[0])
+                                                    t[1] = int(t[1])
+                                                except Exception:
+                                                    await message.channel.send("You have not declared the event time correctly!")
+                                                else:
+                                                    if ((t[0] >= 1) and (t[0] <= 12)):
+                                                        if ((t[1] >= 0) and (t[1] <= 59)):
+                                                            if ((t[2] == "am") or (t[2] == "pm")):
+                                                                
+                                                                ### CODE WORKED
+                                                                v = msg.split(' ')
+                                                                if v[3][-2] == "a":
+                                                                    if t[0] < 10:
+                                                                        v[3] = v[3][0] + v[3][1] + v[3][2] + v[3][3]
+                                                                    else:                                                                      
+                                                                        pumper = v[3][0] + v[3][1]
+                                                                        pumper = int(pumper)
+                                                                        if pumper == 12:
+                                                                            s = list(v[3])
+                                                                            s[0] = "0"
+                                                                            s[1] = "0"
+                                                                            v[3] = "".join(s)
+                                                                        v[3] = v[3][0] + v[3][1] + v[3][2] + v[3][3] + v[3][4]
+                                                                        
+                                                                elif v[3][-2] == "p":
+                                                                    pumper = v[3][0] + v[3][1]
+                                                                    pumper = int(pumper)
+                                                                    if pumper == 12:
+                                                                        t[0] = 12
+                                                                    else:
+                                                                        t[0] += 12      
+                                                                    if len(v[3]) == 6: 
+                                                                        v[3] = str(t[0]) + v[3][1] + v[3][2] + v[3][3]
+                                                                    else:
+                                                                        v[3] = str(t[0]) + v[3][2] + v[3][3] + v[3][4]
+                                                                
+                                                                print("Valid Input : 1 Word Name ->")
+                                                                print(v)
+                                                                add_change(v)
+                                                                
+                                                            else:
+                                                                await message.channel.send("You have not declared the event time correctly!")
+                                                        else:
+                                                            await message.channel.send("You have not declared the event minute correctly!")
+                                                    else:
+                                                        await message.channel.send("You have not declared the event Hour correctly!")
+                                else:
+                                    await message.channel.send("You have not declared the event year correctly!")
+                            else:
+                                await message.channel.send("You have not declared the event Day correctly!")
+                        else:
+                            await message.channel.send("You have not declared the event year correctly!")
+                
+
+    elif msg.startswith('$help'):
+        await message.channel.send(commands)
+    elif msg.startswith('$delete'):
+        thekey = ""
+        with open('events.json') as f:
+            obj = json.load(f)
+            h = msg.split(" ")
+            
+        for i in range(1, len(h)):
+            if (i == len(h) - 1):
+                thekey = thekey + h[i]
+            else:
+                thekey = thekey + h[i] + " " 
+
+        r = dict(obj)
+        del r[thekey]
+        
+        json_object = json.dumps(r, indent = 4)
+        with open("events.json", "w") as outfile:
+            outfile.write(json_object)    
+            
+    elif msg.startswith('$clear'):
+        events = {}
+        write(events)
+        
+    await client.process_commands(message)
+        
+        
+client.run(token)

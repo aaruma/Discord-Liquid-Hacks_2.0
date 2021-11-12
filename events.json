@@ -1,1 +1,20 @@
-{}
+{
+    "Math Assignment 7": {
+        "name": "Math Assignment 7",
+        "date": "11/12/2021",
+        "time": "23:59",
+        "priority": 1
+    },
+    "Team Liquid vs. Vitality CS:GO": {
+        "name": "Team Liquid vs. Vitality CS:GO",
+        "date": "11/24/2021",
+        "time": "6:00",
+        "priority": 2
+    },
+    "Ryerson Co-op Panel": {
+        "name": "Ryerson Co-op Panel",
+        "date": "12/5/2021",
+        "time": "6:30",
+        "priority": 3
+    }
+}
