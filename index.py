@@ -180,12 +180,17 @@ def add_change(msg):
                 for event in events:
                     if events[event]["priority"] == num + 1:
                         new_list[event] = events[event]
-                        
+            
+            # fixing the priorities
+            index = list(new_list)
+            for i in range(0, len(index)):
+                new_list[index[i]]["priority"] = i + 1   
+                         
             write(new_list)
                                                         
             return True
               
-print(add_change(["$add", "hm", "4/21/2022", "8:00"]))
+print(add_change(["$change", "hb", "4/21/2022", "5:30"]))
 
     # "Babu": {
     #     "name": "Babu",
