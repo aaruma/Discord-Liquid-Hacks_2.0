@@ -1,5 +1,6 @@
 # Project Overview: # 
 
+If you ever needed to stay on top of your homework or don't want to miss any important meetings, this discord bot is for you! 
 This discord bot allows users to create a schedule for themselves within the app itself.
 
 <br>
