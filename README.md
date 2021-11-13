@@ -4,7 +4,6 @@ If you ever needed to stay on top of your homework or don't want to miss any imp
 This discord bot allows users to create a schedule for themselves within the app itself.
 
 <br>
-<br>
 
 ## Functionality: ##
 
@@ -20,7 +19,6 @@ This discord bot allows users to create a schedule for themselves within the app
 
 >[Discord Scheduling Bot Project Link](https://github.com/ArjenArumalingam/Discord-Liquid-Hacks_2.0 "Discord Scheduling Bot Project Link")
 
-<br>
 <br>
 
  ## Contact Information: ##
