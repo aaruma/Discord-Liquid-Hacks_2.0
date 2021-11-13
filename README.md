@@ -6,7 +6,7 @@ This discord bot allows users to create a schedule for themselves within the app
 <br>
 <br>
 
-## Example Schedule: ##
+## Functionality: ##
 
 <br>
 
