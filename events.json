@@ -5,16 +5,22 @@
         "time": "23:59",
         "priority": 1
     },
-    "Team Liquid vs. Vitality CS:GO": {
-        "name": "Team Liquid vs. Vitality CS:GO",
+    "Team Liquid Vs. Vitality CS:GO": {
+        "name": "Team Liquid Vs. Vitality CS:GO",
         "date": "11/24/2021",
         "time": "6:00",
         "priority": 2
     },
     "Ryerson Co-op Panel": {
         "name": "Ryerson Co-op Panel",
-        "date": "12/5/2021",
+        "date": "11/26/2021",
         "time": "6:30",
         "priority": 3
+    },
+    "Christmas": {
+        "name": "Christmas",
+        "date": "12/25/2021",
+        "time": "00:00",
+        "priority": 4
     }
 }

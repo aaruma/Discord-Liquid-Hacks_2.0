@@ -1,10 +1,9 @@
 from os import name
 import discord 
 import json
-from discord.ext import commands
+from discord.ext import commands, tasks
 import datetime
 from add_event import add_change
-
 from discord import message
 
 def read_token():
@@ -41,15 +40,6 @@ commands = '''```list of Calendar Bot commands:
             - Example Valid Inputs:
                 -> $add 'Team Liquid Vs. Vitality CS:GO Game' 24/11/21 6:00pm
                 -> $add Lecture 15/11/21 8:00am
-        
-        $events             <none>
-                            <event name>
-
-            - Displays all planned events in a timely order.
-            - Example Valid Inputs:
-                -> $events
-                -> $events Lecture
-                -> $events 'Team Liquid Vs. Vitality CS:GO Game'
                             
         $change             <name> <date> <time>
         
@@ -61,9 +51,10 @@ commands = '''```list of Calendar Bot commands:
         $delete             <event name>
 
             - Delete an event within planned schedule, with an existing event name.
+            - Do not use apostorphes around a multi-word event name
             - Example Valid Inputs:
                 -> $delete Lecture
-                -> $delete 'Team Liquid Vs. Vitality CS:GO Game'
+                -> $delete Team Liquid Vs. Vitality CS:GO Game
 
         $clear              <none>
             
@@ -93,6 +84,7 @@ def write(dict):
 @client.event
 async def on_ready():
     print("We have logged in as {0.user}".format(client))
+
 
 
 @client.command()
@@ -166,7 +158,8 @@ async def on_message(message):
                 string = []
                 string.append(add)  
                 string.append(s[1])
-                
+                print("CHECK TEST VALID")
+                print(s[1])
                 ### Check if date is valid
 
                 x = str(datetime[0])
@@ -235,7 +228,10 @@ async def on_message(message):
                                                                         v = v[0] + v[1] + v[2] + v[3]
                                                                     else:
                                                                         #v = "12:00am"
-                                                                        pumper = v[0] + v[1]
+                                                                        if len(v) == 6:
+                                                                            pumper = v[0]
+                                                                        else:
+                                                                            pumper = v[0] + v[1]
                                                                         pumper = int(pumper)
                                                                         if pumper == 12:
                                                                             s = list(v)
@@ -248,7 +244,12 @@ async def on_message(message):
                                                                         #v = "00:00"
                                                                         
                                                                 elif v[-2] == "p":
-                                                                    pumper = v[0] + v[1]
+                                                                    
+                                                                    if len(v) == 6:
+                                                                        pumper = v[0]
+                                                                    else:
+                                                                        pumper = v[0] + v[1]
+                                                                        
                                                                     pumper = int(pumper)
                                                                     if pumper == 12:
                                                                         t[0] = 12
@@ -344,7 +345,10 @@ async def on_message(message):
                                                                     if t[0] < 10:
                                                                         v[3] = v[3][0] + v[3][1] + v[3][2] + v[3][3]
                                                                     else:                                                                      
-                                                                        pumper = v[3][0] + v[3][1]
+                                                                        if len(v[3]) == 6: 
+                                                                            pumper = v[3][0]
+                                                                        else:
+                                                                            pumper = v[3][0] + v[3][1]
                                                                         pumper = int(pumper)
                                                                         if pumper == 12:
                                                                             s = list(v[3])
@@ -354,7 +358,12 @@ async def on_message(message):
                                                                         v[3] = v[3][0] + v[3][1] + v[3][2] + v[3][3] + v[3][4]
                                                                         
                                                                 elif v[3][-2] == "p":
-                                                                    pumper = v[3][0] + v[3][1]
+                                                                    
+                                                                    if len(v[3]) == 6: 
+                                                                        pumper = v[3][0]
+                                                                    else:
+                                                                        pumper = v[3][0] + v[3][1]
+                                                                        
                                                                     pumper = int(pumper)
                                                                     if pumper == 12:
                                                                         t[0] = 12
@@ -395,14 +404,18 @@ async def on_message(message):
             if (i == len(h) - 1):
                 thekey = thekey + h[i]
             else:
-                thekey = thekey + h[i] + " " 
-
+                thekey = thekey + h[i] + " "   
+        
         r = dict(obj)
-        del r[thekey]
+        del r[thekey]   
+        
+        index = list(r)
+        for i in range(0, len(index)):
+            r[index[i]]["priority"] = i + 1     
         
         json_object = json.dumps(r, indent = 4)
         with open("events.json", "w") as outfile:
-            outfile.write(json_object)    
+            outfile.write(json_object)  
             
     elif msg.startswith('$clear'):
         events = {}

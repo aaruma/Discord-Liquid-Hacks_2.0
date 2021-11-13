@@ -57,12 +57,18 @@ def add_change(msg):
                 curr = events[event]
                 curr_date = curr["date"].split('/')
                 new_date = new_event["date"].split('/')
+                
+                for i in range(len(new_date)):
+                    curr_date[i] = int(curr_date[i])
+                    new_date[i] = int(new_date[i])
+                    
                 # print(curr)
                 # print(new_event)
+                
                 if new_date[2] > curr_date[2]: # Year
                     continue
                 elif new_date[2] == curr_date[2]:
-                    # print("year equal")
+                    print("year equal")
                     if  new_date[0] > curr_date[0]: # Month
                         continue
                     elif new_date[0] == curr_date[0]:
