@@ -14,10 +14,8 @@ This discord bot allows users to create a schedule for themselves within the app
 
 >[Discord Scheduling Bot Project Link](https://github.com/ArjenArumalingam/Discord-Liquid-Hacks_2.0 "Discord Scheduling Bot Project Link")
 
-<br>
 
  ## Contact Information: ##
-<br>
 
 >Name: Arjen Arumalingam <br>
 >Email: arjen.aruma@gmail.com <br>
